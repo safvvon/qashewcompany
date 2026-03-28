@@ -57,33 +57,17 @@ export default function ContactSection() {
                             <div>
                                 <h4 className="text-[#D4AF37] text-xl font-medium tracking-wide mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>Headquarters</h4>
                                 <p className="text-[#C8A97E]/80 font-light leading-relaxed">
-                                    123 Luxury Avenue, Business Bay<br />
-                                    Dubai, United Arab Emirates
+                                    Domicilié à BONDOUKOU quartier CENTRE-VILLE KAMAGAYA<br />
+                                    (lot N°10A ILOT N°911)<br />
+                                    N° CNI CI 000967511 établie le 08/12/2020 à ABIDJAN
                                 </p>
                             </div>
                             
                             <div>
                                 <h4 className="text-[#D4AF37] text-xl font-medium tracking-wide mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>Contact Details</h4>
                                 <p className="text-[#C8A97E]/80 font-light leading-relaxed">
-                                    Phone: +971 4 123 4567<br />
-                                    Email: info@qashew.com
-                                </p>
-                            </div>
-
-                            <div>
-                                <h4 className="text-[#D4AF37] text-xl font-medium tracking-wide mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>Export &amp; Wholesale</h4>
-                                <p className="text-[#C8A97E]/80 font-light leading-relaxed">
-                                    For large volume orders, please email:<br />
-                                    export@qashew.com
-                                </p>
-                            </div>
-
-                            <div>
-                                <h4 className="text-[#D4AF37] text-xl font-medium tracking-wide mb-3" style={{ fontFamily: 'Playfair Display, serif' }}>Business Hours</h4>
-                                <p className="text-[#C8A97E]/80 font-light leading-relaxed">
-                                    Monday - Friday: 9 AM - 6 PM<br />
-                                    Saturday: 10 AM - 4 PM<br />
-                                    Sunday: Closed
+                                    WhatsApp: +233596308908<br />
+                                    Local Number: +2250700816114
                                 </p>
                             </div>
                         </div>
@@ -103,7 +87,7 @@ export default function ContactSection() {
                     <iframe 
                         className="w-full h-full rounded-xl"
                         style={{ filter: "sepia(0.8) hue-rotate(345deg) saturate(1.8) contrast(1) brightness(0.9)" }}
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d8112349.378954751!2d-7.461621644784711!3d7.925577626359556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf7df5cb17ecfb%3A0xff0fd28302061329!2sGhana!5e0!3m2!1sen!2sae!4v1700000000000!5m2!1sen!2sae" 
+                        src="https://maps.google.com/maps?q=8°02'30.3%22N+2°47'47.5%22W&hl=en&z=14&output=embed" 
                         allowFullScreen 
                         loading="lazy" 
                         referrerPolicy="no-referrer-when-downgrade">

@@ -43,7 +43,7 @@ export default function MissionStatement() {
                         Every pristine cashew we select is a testament to our dedication—delivering an anti-gravity experience of flavor that elevates expectations and leaves a lasting impression of absolute excellence.
                     </p>
                     <p className="pt-8 text-[#D4AF37] italic" style={{ fontFamily: 'Playfair Display, serif' }}>
-                        "Because Quality Is Our Signature."
+                        &quot;Because Quality Is Our Signature.&quot;
                     </p>
                 </div>
             </div>

@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll, useTransform, motion, useSpring } from "framer-motion";
+import { useScroll, useTransform, motion, useSpring, AnimatePresence } from "framer-motion";
 
 // Update this to match your actual total image count
 const TOTAL_FRAMES = 192;
+
+// Constant game-style tips
+const GAME_TIPS = [
+    "Tip: Our cashews are hand-selected for the perfect curve and crunch.",
+    "Did you know? Cashews grow outside of the cashew apple as the true fruit.",
+    "Tip: Precision roasting unlocks the anti-gravity luxury flavor.",
+    "Hint: The golden standard starts with ethical, sustainable sourcing.",
+    "System: Preparing the collection... Quality is our signature."
+];
 
 export default function ScrollySequence() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -13,6 +22,17 @@ export default function ScrollySequence() {
     const [images, setImages] = useState<HTMLImageElement[]>([]);
     const [imagesLoaded, setImagesLoaded] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [loadProgress, setLoadProgress] = useState(0);
+    const [activeTip, setActiveTip] = useState(0);
+
+    // Rotate game tips while loading
+    useEffect(() => {
+        if (imagesLoaded) return;
+        const interval = setInterval(() => {
+            setActiveTip((prev) => (prev + 1) % GAME_TIPS.length);
+        }, 3200);
+        return () => clearInterval(interval);
+    }, [imagesLoaded]);
 
     // 1. Preload the Image Sequence
     useEffect(() => {
@@ -27,6 +47,7 @@ export default function ScrollySequence() {
 
             const checkLoad = () => {
                 loadedCount++;
+                setLoadProgress(Math.floor((loadedCount / TOTAL_FRAMES) * 100));
                 if (loadedCount === TOTAL_FRAMES) setImagesLoaded(true);
             };
 
@@ -148,7 +169,7 @@ export default function ScrollySequence() {
         <div ref={containerRef} id="home" className="h-[400vh] relative bg-[#000000]">
             {/* Header / Navbar Appears at 90% */}
             <motion.nav style={{ opacity: opacityCta, pointerEvents: pointerEventsCta as any }} className="navbar fixed top-0 w-full z-[1000] flex justify-between items-center py-6 px-8 md:px-12 bg-black border-b border-[#D4AF37]/30 shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-b-3xl">
-                <div className="logo font-playfair text-[#D4AF37] tracking-[4px]">QASHEW</div>
+                <a href="#home" className="logo font-playfair text-[#D4AF37] tracking-[4px] cursor-pointer hover:text-[#F3E5AB] transition">QASHEW</a>
                 <div
                     className={`hamburger flex flex-col gap-[6px] cursor-pointer z-[1001] ${menuOpen ? 'active' : ''}`}
                     onClick={() => setMenuOpen(!menuOpen)}
@@ -171,10 +192,80 @@ export default function ScrollySequence() {
 
             {/* Loading State */}
             {!imagesLoaded && (
-                <div className="sticky top-0 h-screen w-full flex items-center justify-center bg-[#000000] text-white/60 z-50">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-8 h-8 rounded-full border-t-2 border-white animate-spin"></div>
-                        <p className="tracking-widest uppercase text-sm font-medium">Loading Experience...</p>
+                <div className="fixed inset-0 min-h-screen w-full flex flex-col items-center justify-center bg-[#050505] z-[9999] border-y-[4px] border-[#D4AF37]/20 shadow-[inset_0_0_200px_rgba(0,0,0,0.9)]">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(40,30,20,0.6)_0%,rgba(5,5,5,1)_100%)] pointer-events-none"></div>
+                    
+                    <div className="relative flex flex-col items-center justify-center gap-6 z-10 w-full px-8">
+                        {/* Abstract Luxury Cashew Crescent Icon */}
+                        <motion.div 
+                            className="relative flex items-center justify-center w-32 h-32 mb-4"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 1 }}
+                        >
+                            <motion.div 
+                                className="absolute w-16 h-16 border-[6px] border-[#D4AF37] rounded-full border-r-transparent border-t-transparent shadow-[0_0_25px_rgba(212,175,55,0.7)]"
+                                style={{ rotate: 135 }}
+                                animate={{ scale: [1, 1.05, 1], filter: ["brightness(1)", "brightness(1.5)", "brightness(1)"] }}
+                                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                            />
+                            <motion.div 
+                                className="absolute w-24 h-24 border-[1px] border-[#D4AF37]/40 rounded-full"
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+                            />
+                            <motion.div 
+                                className="absolute w-28 h-28 border-[1px] border-dashed border-[#D4AF37]/20 rounded-full"
+                                animate={{ rotate: -360 }}
+                                transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
+                            />
+                        </motion.div>
+
+                        {/* QASHEW Text Shimmer */}
+                        <div className="text-3xl md:text-5xl font-bold tracking-[0.4em] text-center uppercase" style={{ fontFamily: 'Playfair Display, serif' }}>
+                            <span className="text-[#C8A97E] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+                                QASHEW
+                            </span>
+                        </div>
+
+                        {/* Game-style Progress Bar */}
+                        <div className="w-64 md:w-96 mt-4 flex flex-col items-center">
+                            <div className="flex justify-between w-full mb-3 px-1">
+                                <span className="text-[#D4AF37] font-mono text-[10px] tracking-widest uppercase">Loading Assets</span>
+                                <span className="text-[#D4AF37] font-mono text-[10px] tracking-widest">{loadProgress}%</span>
+                            </div>
+                            <div className="w-full h-[2px] bg-white/10 relative overflow-hidden">
+                                <motion.div 
+                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#C8A97E] to-[#D4AF37]"
+                                    initial={{ width: "0%" }}
+                                    animate={{ width: `${loadProgress}%` }}
+                                    transition={{ duration: 0.1, ease: "linear" }}
+                                />
+                                <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem] animate-[loadingBar_1s_linear_infinite] mix-blend-overlay"></div>
+                                <style jsx>{`
+                                    @keyframes loadingBar {
+                                        0% { background-position: 1rem 0; }
+                                        100% { background-position: 0 0; }
+                                    }
+                                `}</style>
+                            </div>
+                        </div>
+
+                        {/* Rotating Game Tips */}
+                        <div className="h-10 mt-4 flex items-center justify-center">
+                            <AnimatePresence mode="wait">
+                                <motion.p 
+                                    key={activeTip}
+                                    initial={{ opacity: 0, y: 5, filter: "blur(4px)" }}
+                                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                                    exit={{ opacity: 0, y: -5, filter: "blur(4px)" }}
+                                    transition={{ duration: 0.6 }}
+                                    className="tracking-[0.2em] uppercase text-[9px] md:text-[10px] text-[#C8A97E]/70 font-light text-center max-w-sm px-4"
+                                >
+                                    {GAME_TIPS[activeTip]}
+                                </motion.p>
+                            </AnimatePresence>
+                        </div>
                     </div>
                 </div>
             )}

@@ -56,8 +56,8 @@ const LOCATION_DATA = [
         lat: -0.7893,
         lng: 113.9213,
         desc: {
-            title: "International Trading",
-            text: "Import and export of raw cashew nuts and kernels with strong global supply chain partnerships."
+            title: "Procurement & Trading",
+            text: "Indonesia is also a procurement center. Import and export of raw cashew nuts and kernels with strong global supply chain partnerships."
         },
         bg: "radial-gradient(ellipse at center, rgba(15,30,20,0.8) 0%, rgba(5,5,5,1) 100%)"
     },
@@ -95,6 +95,7 @@ export default function GlobalPresence() {
     const [activeIndex, setActiveIndex] = useState(0);
 
     const [isInteracting, setIsInteracting] = useState(false);
+    const [initError, setInitError] = useState<string | null>(null);
     const isInteractingRef = useRef(false);
     const pointerPos = useRef<{ x: number, y: number } | null>(null);
 
@@ -127,75 +128,99 @@ export default function GlobalPresence() {
     }, [activeIndex, phi, theta]);
 
     useEffect(() => {
-        let currentPhi = 0;
-        let currentTheta = 0;
-
-        const unsubPhi = phi.onChange((v) => currentPhi = v);
-        const unsubTheta = theta.onChange((v) => currentTheta = v);
-
         if (!canvasRef.current) return;
 
-        const globe = createGlobe(canvasRef.current, {
-            devicePixelRatio: 2,
-            width: 1000,
-            height: 1000,
-            phi: 0,
-            theta: 0,
-            dark: 1,
-            diffuse: 1.0,
-            mapSamples: 16000,
-            mapBrightness: 5,
-            baseColor: [0.16, 0.12, 0.08],
-            markerColor: [0.83, 0.68, 0.21],
-            glowColor: [0.2, 0.15, 0.1],
-            opacity: 0.95,
-            markers: LOCATION_DATA.map((loc, i) => ({
-                location: [loc.lat, loc.lng] as [number, number],
-                size: i === activeIndex ? 0.12 : 0.06
-            })),
-            onRender: (state) => {
-                // Add tiny constant rotation to keep it alive
-                state.phi = currentPhi + (performance.now() * 0.00005);
-                state.theta = currentTheta;
-                
-                // Dynamically update markers if the active index changed
-                if ((state as any).__lastIndex !== activeIndexRef.current) {
-                    (state as any).markers = LOCATION_DATA.map((loc, i) => ({
-                        location: [loc.lat, loc.lng] as [number, number],
-                        size: i === activeIndexRef.current ? 0.12 : 0.06
-                    }));
-                    (state as any).__lastIndex = activeIndexRef.current;
-                }
-            },
+        const globeMarkers = LOCATION_DATA.map((loc, i) => ({
+            location: [loc.lat, loc.lng] as [number, number],
+            size: i === activeIndex ? 0.15 : 0.08
+        }));
+
+        let globe: any;
+        const currentRef = canvasRef.current;
+        if (!currentRef || !currentRef.parentElement) return;
+
+        let currentWidth = currentRef.parentElement.offsetWidth || 300;
+
+        const resizeObserver = new ResizeObserver((entries) => {
+            if (entries[0] && entries[0].contentRect) {
+                currentWidth = entries[0].contentRect.width;
+            }
         });
+        
+        resizeObserver.observe(currentRef.parentElement);
+
+        const initTimer = setTimeout(() => {
+            try {
+                globe = createGlobe(currentRef, {
+                    devicePixelRatio: 2,
+                    width: currentWidth * 2,
+                    height: currentWidth * 2,
+                    phi: 0,
+                    theta: 0,
+                    dark: 1,
+                    diffuse: 1.0,
+                    mapSamples: 12000,
+                    mapBrightness: 5,
+                    baseColor: [0.16, 0.12, 0.08],
+                    markerColor: [0.83, 0.68, 0.21],
+                    glowColor: [0.2, 0.15, 0.1],
+                    scale: 0.95,
+                    markers: globeMarkers,
+                    onRender: (state) => {
+                        // Constant rotation using the direct MotionValue gets, bypassing async on-change gaps
+                        state.phi = phi.get() + (performance.now() * 0.00005);
+                        state.theta = theta.get();
+                        
+                        // Dynamically update the cobe internal width parameter for responsive resizing
+                        state.width = currentWidth * 2;
+                        state.height = currentWidth * 2;
+
+                        if ((state as any).__lastIndex !== activeIndexRef.current) {
+                            for (let i = 0; i < globeMarkers.length; i++) {
+                                globeMarkers[i].size = i === activeIndexRef.current ? 0.18 : 0.08;
+                            }
+                            (state as any).__lastIndex = activeIndexRef.current;
+                        }
+                    },
+                });
+                
+                // Allow CSS to handle the container constraints fully
+                currentRef.style.width = "100%";
+                currentRef.style.height = "100%";
+                
+                setInitError(null);
+            } catch (err: any) {
+                console.error("COBE INIT ERROR:", err);
+                setInitError(err?.message || "Unknown WebGL Error");
+            }
+        }, 100);
 
         return () => {
-            globe.destroy();
-            unsubPhi();
-            unsubTheta();
+            resizeObserver.disconnect();
+            clearTimeout(initTimer);
+            if (globe) {
+                globe.destroy();
+            }
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [phi, theta]); // Removed activeIndex from dependencies to prevent WebGL context exhaustion
 
     const activeLoc = LOCATION_DATA[activeIndex];
 
     return (
-        <section id="export" className="relative w-full min-h-screen bg-[#050505] overflow-hidden flex flex-col justify-center py-20 z-30 border-t border-[#D4AF37]/20">
+        <section id="export" className="relative w-full min-h-screen bg-[#050505] overflow-x-hidden flex flex-col justify-center py-20 z-30 border-t border-[#D4AF37]/20">
             {/* Soft Ambient Particles and Thematic Background */}
             <motion.div
                 className="absolute inset-0 z-0 transition-all duration-1000 ease-in-out"
                 style={{ background: activeLoc.bg }}
             />
 
-            {/* Abstract Background Imagery overlayed subtly removed as requested */}
-
             {/* Directed Trade Routes: Narrow golden arrows pointing from origins towards processing hubs (India & Vietnam) */}
             <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-40 mix-blend-screen" preserveAspectRatio="none">
                 <defs>
-                    {/* Golden Arrowhead Marker */}
                     <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="6" refY="3" orient="auto">
                         <polygon points="0 0, 6 3, 0 6" fill="#D4AF37" opacity="0.8" />
                     </marker>
-                    {/* Fading Tail Gradient */}
                     <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stopColor="#D4AF37" stopOpacity="0" />
                         <stop offset="60%" stopColor="#D4AF37" stopOpacity="0.8" />
@@ -204,57 +229,17 @@ export default function GlobalPresence() {
                 </defs>
 
                 {/* Arrow 1: West Africa to India Hub */}
-                <motion.path
-                    d="M -100 600 Q 400 300 850 450"
-                    fill="none"
-                    stroke="url(#lineGrad)"
-                    strokeWidth="1.5"
-                    markerEnd="url(#arrowhead)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.6 }}
-                    transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 1 }}
-                />
-
+                <motion.path d="M -100 600 Q 400 300 850 450" fill="none" stroke="url(#lineGrad)" strokeWidth="1.5" markerEnd="url(#arrowhead)" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.6 }} transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 1 }} />
                 {/* Arrow 2: West Africa to Vietnam Hub */}
-                <motion.path
-                    d="M -50 750 Q 500 450 1100 550"
-                    fill="none"
-                    stroke="url(#lineGrad)"
-                    strokeWidth="1.5"
-                    markerEnd="url(#arrowhead)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.5 }}
-                    transition={{ duration: 4.5, delay: 1, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 0.5 }}
-                />
-
+                <motion.path d="M -50 750 Q 500 450 1100 550" fill="none" stroke="url(#lineGrad)" strokeWidth="1.5" markerEnd="url(#arrowhead)" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.5 }} transition={{ duration: 4.5, delay: 1, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 0.5 }} />
                 {/* Arrow 3: Indonesia to India Hub */}
-                <motion.path
-                    d="M 1500 800 Q 1100 700 850 450"
-                    fill="none"
-                    stroke="url(#lineGrad)"
-                    strokeWidth="1.5"
-                    markerEnd="url(#arrowhead)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.6 }}
-                    transition={{ duration: 3, delay: 0.5, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 1.5 }}
-                />
-
+                <motion.path d="M 1500 800 Q 1100 700 850 450" fill="none" stroke="url(#lineGrad)" strokeWidth="1.5" markerEnd="url(#arrowhead)" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.6 }} transition={{ duration: 3, delay: 0.5, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 1.5 }} />
                 {/* Arrow 4: Indonesia to Vietnam Hub */}
-                <motion.path
-                    d="M 1400 650 Q 1200 600 1100 550"
-                    fill="none"
-                    stroke="url(#lineGrad)"
-                    strokeWidth="1.5"
-                    markerEnd="url(#arrowhead)"
-                    initial={{ pathLength: 0, opacity: 0 }}
-                    animate={{ pathLength: 1, opacity: 0.5 }}
-                    transition={{ duration: 2.5, delay: 1.5, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 2 }}
-                />
+                <motion.path d="M 1400 650 Q 1200 600 1100 550" fill="none" stroke="url(#lineGrad)" strokeWidth="1.5" markerEnd="url(#arrowhead)" initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 0.5 }} transition={{ duration: 2.5, delay: 1.5, repeat: Infinity, ease: "easeInOut", repeatType: "loop", repeatDelay: 2 }} />
             </svg>
 
             <div className="max-w-7xl mx-auto w-full px-6 flex flex-col lg:flex-row items-center relative z-10 h-full">
 
-                {/* Left Side: Dynamic Information Panel */}
                 <div className="w-full lg:w-1/2 flex flex-col justify-center pt-10 lg:pt-0 pointer-events-none">
                     <p className="text-[#D4AF37] tracking-[0.4em] text-sm md:text-md font-semibold mb-6 uppercase drop-shadow-md">
                         Global Presence
@@ -263,7 +248,6 @@ export default function GlobalPresence() {
                         Connecting <br /><span className="gold-gradient">The World</span>.
                     </h2>
 
-                    {/* Animated Description Card */}
                     <div className="h-[280px] w-full max-w-lg relative pointer-events-auto">
                         <AnimatePresence mode="wait">
                             <motion.div
@@ -285,44 +269,48 @@ export default function GlobalPresence() {
                     </div>
                 </div>
 
-                {/* Right Side: The 3D Globe */}
-                <div className="w-full lg:w-1/2 flex items-center justify-center min-h-[350px] lg:min-h-[500px] mt-12 lg:mt-0 relative">
+                <div className="w-full lg:w-1/2 flex items-center justify-center min-h-[400px] lg:min-h-[600px] mt-12 lg:mt-0 relative">
                     <div className="absolute inset-0 rounded-full bg-[#D4AF37]/5 blur-[120px] mix-blend-screen pointer-events-none"></div>
-                    <canvas
-                        ref={canvasRef}
-                        className="mx-auto max-w-[260px] sm:max-w-[300px] md:max-w-[450px] lg:max-w-[600px]"
-                        style={{
-                            width: "100%",
-                            height: "auto",
-                            aspectRatio: "1/1",
-                            filter: "drop-shadow(0px 30px 40px rgba(0,0,0,0.8))",
-                            cursor: isInteracting ? "grabbing" : "grab",
-                            touchAction: "none"
-                        }}
-                        onPointerDown={(e) => {
-                            setIsInteracting(true);
-                            pointerPos.current = { x: e.clientX, y: e.clientY };
-                        }}
-                        onPointerUp={() => {
-                            setIsInteracting(false);
-                            pointerPos.current = null;
-                        }}
-                        onPointerOut={() => {
-                            setIsInteracting(false);
-                            pointerPos.current = null;
-                        }}
-                        onPointerMove={(e) => {
-                            if (isInteracting && pointerPos.current) {
-                                const deltaX = e.clientX - pointerPos.current.x;
-                                const deltaY = e.clientY - pointerPos.current.y;
-                                pointerPos.current = { x: e.clientX, y: e.clientY };
-
-                                // Restored 360-degree high sensitivity rotation
-                                phi.set(phi.get() + deltaX * 0.015);
-                                theta.set(theta.get() + deltaY * 0.015);
-                            }
-                        }}
-                    />
+                    
+                    {initError ? (
+                        <div className="text-red-500 font-mono text-center p-4 border border-red-500 rounded bg-red-500/10 z-50">
+                            <strong>COBE WEBGL ERROR:</strong><br />{initError}
+                        </div>
+                    ) : (
+                        <div className="w-full max-w-[350px] md:max-w-[450px] lg:max-w-[550px] mx-auto self-center flex-shrink-0 relative">
+                            {/* Bulletproof 1:1 Aspect Ratio hack for all mobile browsers */}
+                            <div style={{ paddingBottom: "100%" }}></div>
+                            <canvas
+                                ref={canvasRef}
+                                className="absolute inset-0 block !w-full !h-full !max-w-full object-contain"
+                                style={{
+                                    filter: "drop-shadow(0px 20px 30px rgba(0,0,0,0.6))",
+                                    cursor: isInteracting ? "grabbing" : "grab",
+                                    touchAction: "pan-y"
+                                }}
+                                onPointerDown={(e) => {
+                                    setIsInteracting(true);
+                                    pointerPos.current = { x: e.clientX, y: e.clientY };
+                                }}
+                                onPointerUp={() => {
+                                    setIsInteracting(false);
+                                    pointerPos.current = null;
+                                }}
+                                onPointerOut={() => {
+                                    setIsInteracting(false);
+                                    pointerPos.current = null;
+                                }}
+                                onPointerMove={(e) => {
+                                    if (isInteracting && pointerPos.current) {
+                                        const deltaX = e.clientX - pointerPos.current.x;
+                                        // Only rotate horizontally heavily, allow vertical scroll
+                                        pointerPos.current = { x: e.clientX, y: e.clientY };
+                                        phi.set(phi.get() + deltaX * 0.015);
+                                    }
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 

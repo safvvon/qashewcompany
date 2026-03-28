@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
+import { useRef } from "react";
+import { motion } from "framer-motion";
 
 const FloatingParticle = ({ size, delay, duration, xStart, xEnd }: any) => {
     return (
@@ -26,11 +26,8 @@ const FloatingParticle = ({ size, delay, duration, xStart, xEnd }: any) => {
 
 export default function CashewCollection() {
     const containerRef = useRef<HTMLDivElement>(null);
-    const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start end", "end start"] });
 
-    const smoothScroll = useSpring(scrollYProgress, { stiffness: 60, damping: 20 });
-    const yFloat = useTransform(smoothScroll, [0, 1], [100, -100]);
-    const rotateFloat = useTransform(smoothScroll, [0, 1], [0, 15]);
+
 
     return (
         <div ref={containerRef} id="products" className="relative w-full bg-[#050505] text-white py-32 overflow-hidden flex flex-col items-center">
@@ -83,8 +80,7 @@ export default function CashewCollection() {
                         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
                         className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-8 flex justify-center items-center"
                     >
-                        <div className="absolute inset-0 bg-[#D4AF37]/20 rounded-full blur-[60px] animate-pulse"></div>
-                        <img src="/raw_single_cashew.png?v=3" alt="Raw Cashew Nut" className="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.8)]"
+                        <img src="/user_cashew_nobg.png" alt="Raw Cashew Nut" className="w-full h-full object-contain"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                     </motion.div>
                 </motion.div>
@@ -152,9 +148,9 @@ export default function CashewCollection() {
                             }}
                         >
                             <img 
-                                src="/raw_single_cashew.png?v=3" 
+                                src="/user_cashew_nobg.png" 
                                 alt="Falling Cashew" 
-                                className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity" 
+                                className="w-full h-full object-contain opacity-80 hover:opacity-100 transition-opacity drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]" 
                             />
                         </motion.div>
                     );
@@ -243,11 +239,7 @@ export default function CashewCollection() {
                         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                         className="relative w-64 h-64 md:w-80 md:h-80 mx-auto mt-10"
                     >
-                        {/* Soft light beams from behind the crate */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[200%] bg-gradient-to-t from-transparent via-[#D4AF37]/20 to-transparent blur-[40px] rotate-45 pointer-events-none"></div>
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[200%] bg-gradient-to-t from-transparent via-[#D4AF37]/20 to-transparent blur-[40px] -rotate-45 pointer-events-none"></div>
-
-                        <img src="/cashew_luxury_box.png" alt="Luxury Cashew Crate" className="w-full h-full object-contain relative z-10 drop-shadow-[0_30px_50px_rgba(0,0,0,0.9)]"
+                        <img src="/raw_single_cashew.png" alt="Premium Cashew Group" className="w-full h-full object-contain relative z-10"
                             onError={(e) => { e.currentTarget.style.display = 'none'; }} />
                     </motion.div>
 

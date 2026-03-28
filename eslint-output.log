@@ -1,0 +1,33 @@
+[0m[0m
+[0m[4mC:\Users\sebin\Desktop\QASHEW COMPANY\app\mission\page.tsx[24m[0m
+[0m  [2m69:29[22m  [31merror[39m  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m  [2m69:63[22m  [31merror[39m  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m[0m
+[0m[4mC:\Users\sebin\Desktop\QASHEW COMPANY\components\CashewCollection.tsx[24m[0m
+[0m    [2m3:10[22m  [31merror[39m    'useEffect' is defined but never used                                                                                                                                                                                                                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m    [2m4:54[22m  [31merror[39m    'useInView' is defined but never used                                                                                                                                                                                                                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m32:11[22m  [31merror[39m    'yFloat' is assigned a value but never used                                                                                                                                                                                                                     [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m33:11[22m  [31merror[39m    'rotateFloat' is assigned a value but never used                                                                                                                                                                                                                [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m87:25[22m  [33mwarning[39m  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [2m@next/next/no-img-element[22m[0m
+[0m  [2m154:29[22m  [33mwarning[39m  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [2m@next/next/no-img-element[22m[0m
+[0m  [2m250:25[22m  [33mwarning[39m  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [2m@next/next/no-img-element[22m[0m
+[0m[0m
+[0m[4mC:\Users\sebin\Desktop\QASHEW COMPANY\components\CraftsmanshipSection.tsx[24m[0m
+[0m   [2m4:8[22m   [31merror[39m    'Link' is defined but never used                                                                                                                                                                                                                                [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m75:25[22m  [33mwarning[39m  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [2m@next/next/no-img-element[22m[0m
+[0m[0m
+[0m[4mC:\Users\sebin\Desktop\QASHEW COMPANY\components\GlobalPresence.tsx[24m[0m
+[0m  [2m131:13[22m  [31merror[39m    'currentPhi' is assigned a value but never used                                                                 [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m132:13[22m  [31merror[39m    'currentTheta' is assigned a value but never used                                                               [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m190:8[22m   [33mwarning[39m  React Hook useEffect has a missing dependency: 'activeIndex'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mC:\Users\sebin\Desktop\QASHEW COMPANY\components\LegacyContent.tsx[24m[0m
+[0m  [2m113:29[22m  [33mwarning[39m  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [2m@next/next/no-img-element[22m[0m
+[0m  [2m132:29[22m  [33mwarning[39m  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  [2m@next/next/no-img-element[22m[0m
+[0m[0m
+[0m[4mC:\Users\sebin\Desktop\QASHEW COMPANY\components\MissionStatement.tsx[24m[0m
+[0m  [2m46:25[22m  [31merror[39m  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m  [2m46:59[22m  [31merror[39m  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  [2mreact/no-unescaped-entities[22m[0m
+[0m[0m
+[0m[31m[1m✖ 18 problems (11 errors, 7 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m
