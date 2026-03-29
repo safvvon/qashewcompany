@@ -139,15 +139,14 @@ export default function GlobalPresence() {
         const currentRef = canvasRef.current;
         if (!currentRef || !currentRef.parentElement) return;
 
-        let currentWidth = currentRef.parentElement.offsetWidth || 300;
-
-        const resizeObserver = new ResizeObserver((entries) => {
-            if (entries[0] && entries[0].contentRect) {
-                currentWidth = entries[0].contentRect.width;
+        let currentWidth = 300;
+        const onResize = () => {
+            if (currentRef && currentRef.parentElement) {
+                currentWidth = currentRef.parentElement.offsetWidth || 300;
             }
-        });
-        
-        resizeObserver.observe(currentRef.parentElement);
+        };
+        window.addEventListener('resize', onResize);
+        onResize();
 
         const initTimer = setTimeout(() => {
             try {
@@ -196,7 +195,7 @@ export default function GlobalPresence() {
         }, 100);
 
         return () => {
-            resizeObserver.disconnect();
+            window.removeEventListener('resize', onResize);
             clearTimeout(initTimer);
             if (globe) {
                 globe.destroy();
@@ -286,7 +285,8 @@ export default function GlobalPresence() {
                                 style={{
                                     filter: "drop-shadow(0px 20px 30px rgba(0,0,0,0.6))",
                                     cursor: isInteracting ? "grabbing" : "grab",
-                                    touchAction: "pan-y"
+                                    touchAction: "pan-y",
+                                    contain: "layout paint size"
                                 }}
                                 onPointerDown={(e) => {
                                     setIsInteracting(true);
