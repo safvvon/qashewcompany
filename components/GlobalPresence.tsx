@@ -130,83 +130,69 @@ export default function GlobalPresence() {
     useEffect(() => {
         if (!canvasRef.current) return;
 
-        const globeMarkers = LOCATION_DATA.map((loc, i) => ({
-            location: [loc.lat, loc.lng] as [number, number],
-            size: i === activeIndex ? 0.15 : 0.08
-        }));
-
         let globe: any;
         const currentRef = canvasRef.current;
-        if (!currentRef || !currentRef.parentElement) return;
-
-        let currentWidth = currentRef.parentElement.offsetWidth || 300;
-
-        const resizeObserver = new ResizeObserver((entries) => {
-            if (entries[0] && entries[0].target) {
-                const newWidth = Math.round((entries[0].target as HTMLElement).offsetWidth);
-                if (newWidth > 0 && Math.abs(currentWidth - newWidth) > 2) {
-                    currentWidth = newWidth;
-                }
+        
+        let width = 0;
+        const onResize = () => {
+            if (currentRef) {
+                width = currentRef.offsetWidth;
             }
-        });
+        };
+        window.addEventListener('resize', onResize);
+        onResize();
+        
+        // Guarantee initial paint dimension fallback
+        if (!width || width === 0) width = 600;
 
-        resizeObserver.observe(currentRef.parentElement);
+        const globeMarkers = LOCATION_DATA.map((loc) => ({
+            location: [loc.lat, loc.lng] as [number, number],
+            size: 0.08
+        }));
 
-        const initTimer = setTimeout(() => {
-            try {
-                globe = createGlobe(currentRef, {
-                    devicePixelRatio: 2,
-                    width: currentWidth * 2,
-                    height: currentWidth * 2,
-                    phi: 0,
-                    theta: 0,
-                    dark: 1,
-                    diffuse: 1.0,
-                    mapSamples: 12000,
-                    mapBrightness: 5,
-                    baseColor: [0.16, 0.12, 0.08],
-                    markerColor: [0.83, 0.68, 0.21],
-                    glowColor: [0.2, 0.15, 0.1],
-                    scale: 0.95,
-                    markers: globeMarkers,
-                    onRender: (state) => {
-                        // Constant rotation using the direct MotionValue gets, bypassing async on-change gaps
-                        state.phi = phi.get() + (performance.now() * 0.00005);
-                        state.theta = theta.get();
-                        
-                        // Dynamically update the cobe internal width parameter for responsive resizing
-                        state.width = currentWidth * 2;
-                        state.height = currentWidth * 2;
+        try {
+            globe = createGlobe(currentRef, {
+                devicePixelRatio: 2,
+                width: width * 2,
+                height: width * 2,
+                phi: 0,
+                theta: 0,
+                dark: 1,
+                diffuse: 1.2,
+                mapSamples: 16000,
+                mapBrightness: 6,
+                baseColor: [0.3, 0.25, 0.2],
+                markerColor: [0.9, 0.7, 0.2],
+                glowColor: [0.3, 0.25, 0.15],
+                scale: 0.95, // Reset scale cleanly 
+                markers: globeMarkers,
+                onRender: (state) => {
+                    state.phi = (phi.get() || 0) + (performance.now() * 0.00005);
+                    state.theta = (theta.get() || 0);
+                    
+                    // Allow cobe to govern its own scaling flawlessly
+                    state.width = width * 2;
+                    state.height = width * 2;
 
-                        if ((state as any).__lastIndex !== activeIndexRef.current) {
-                            for (let i = 0; i < globeMarkers.length; i++) {
-                                globeMarkers[i].size = i === activeIndexRef.current ? 0.18 : 0.08;
-                            }
-                            (state as any).__lastIndex = activeIndexRef.current;
-                        }
-                    },
-                });
-                
-                // Allow CSS to handle the container constraints fully
-                currentRef.style.width = "100%";
-                currentRef.style.height = "100%";
-                
-                setInitError(null);
-            } catch (err: any) {
-                console.error("COBE INIT ERROR:", err);
-                setInitError(err?.message || "Unknown WebGL Error");
-            }
-        }, 100);
+                    for (let i = 0; i < globeMarkers.length; i++) {
+                        globeMarkers[i].size = i === activeIndexRef.current ? 0.18 : 0.08;
+                    }
+                },
+            });
+            
+            setInitError(null);
+        } catch (err: any) {
+            console.error("COBE INIT ERROR:", err);
+            setInitError(err?.message || "Unknown WebGL Error");
+        }
 
         return () => {
-            resizeObserver.disconnect();
-            clearTimeout(initTimer);
+            window.removeEventListener('resize', onResize);
             if (globe) {
                 globe.destroy();
             }
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [phi, theta]); // Removed activeIndex from dependencies to prevent WebGL context exhaustion
+    }, [phi, theta]);
 
     const activeLoc = LOCATION_DATA[activeIndex];
 
@@ -243,11 +229,11 @@ export default function GlobalPresence() {
 
             <div className="max-w-7xl mx-auto w-full px-6 flex flex-col lg:flex-row items-center relative z-10 h-full">
 
-                <div className="w-full lg:w-1/2 flex flex-col justify-center pt-10 lg:pt-0 pointer-events-none">
+                <div className="w-full lg:w-[45%] flex flex-col justify-center pt-10 lg:pt-0 pointer-events-none relative z-20">
                     <p className="text-[#D4AF37] tracking-[0.4em] text-sm md:text-md font-semibold mb-6 uppercase drop-shadow-md">
                         Global Presence
                     </p>
-                    <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white/90 mb-12" style={{ fontFamily: 'Playfair Display, serif', textShadow: '0px 4px 20px rgba(0,0,0,0.6)' }}>
+                    <h2 className="text-5xl md:text-7xl lg:text-[5.5rem] lg:leading-[1.1] font-bold tracking-tight text-white/90 mb-12" style={{ fontFamily: 'Playfair Display, serif', textShadow: '0px 4px 20px rgba(0,0,0,0.6)' }}>
                         Connecting <br /><span className="gold-gradient">The World</span>.
                     </h2>
 
@@ -272,24 +258,24 @@ export default function GlobalPresence() {
                     </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 flex items-center justify-center min-h-[400px] lg:min-h-[600px] mt-12 lg:mt-0 relative">
-                    <div className="absolute inset-0 rounded-full bg-[#D4AF37]/5 blur-[120px] mix-blend-screen pointer-events-none"></div>
+                <div className="w-full lg:w-[50%] flex items-center justify-center min-h-[320px] md:min-h-[400px] lg:min-h-[800px] mt-8 lg:mt-0 relative z-10">
+                    <div className="absolute inset-0 rounded-full bg-[#D4AF37]/5 blur-[80px] md:blur-[120px] mix-blend-screen pointer-events-none lg:scale-125"></div>
                     
                     {initError ? (
                         <div className="text-red-500 font-mono text-center p-4 border border-red-500 rounded bg-red-500/10 z-50">
                             <strong>COBE WEBGL ERROR:</strong><br />{initError}
                         </div>
                     ) : (
-                        <div className="w-full max-w-[350px] md:max-w-[450px] lg:max-w-[550px] mx-auto self-center flex-shrink-0 relative">
-                            {/* Bulletproof 1:1 Aspect Ratio hack for all mobile browsers */}
-                            <div style={{ paddingBottom: "100%" }}></div>
+                        <div style={{ width: "100%", maxWidth: "700px", aspectRatio: 1, margin: "auto", position: "relative" }}>
                             <canvas
                                 ref={canvasRef}
-                                className="absolute inset-0 block !w-full !h-full !max-w-full object-contain"
                                 style={{
+                                    width: "100%",
+                                    height: "100%",
                                     filter: "drop-shadow(0px 20px 30px rgba(0,0,0,0.6))",
                                     cursor: isInteracting ? "grabbing" : "grab",
-                                    touchAction: "pan-y"
+                                    touchAction: "pan-y",
+                                    opacity: 1
                                 }}
                                 onPointerDown={(e) => {
                                     setIsInteracting(true);
