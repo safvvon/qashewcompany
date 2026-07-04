@@ -29,9 +29,9 @@ export default function MissionStatement() {
                 <p className="text-[#D4AF37] tracking-[0.4em] text-sm md:text-md font-semibold mb-6 uppercase drop-shadow-md">
                     Our Mission
                 </p>
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white/90 mb-10" style={{ fontFamily: 'Playfair Display, serif', textShadow: '0px 4px 20px rgba(0,0,0,0.6)' }}>
+                <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-white/90 mb-10" style={{ fontFamily: 'Playfair Display, serif', textShadow: '0px 4px 20px rgba(0,0,0,0.6)' }}>
                     A heritage of <span className="gold-gradient">excellence</span>.
-                </h1>
+                </h2>
 
                 <div className="gold-underline mx-auto mb-10" style={{ width: '100px' }}></div>
 
