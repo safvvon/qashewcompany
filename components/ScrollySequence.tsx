@@ -6,33 +6,14 @@ import { useScroll, useTransform, motion, useSpring, AnimatePresence } from "fra
 // Update this to match your actual total image count
 const TOTAL_FRAMES = 192;
 
-// Constant game-style tips
-const GAME_TIPS = [
-    "Tip: Our cashews are hand-selected for the perfect curve and crunch.",
-    "Did you know? Cashews grow outside of the cashew apple as the true fruit.",
-    "Tip: Precision roasting unlocks the anti-gravity luxury flavor.",
-    "Hint: The golden standard starts with ethical, sustainable sourcing.",
-    "System: Preparing the collection... Quality is our signature."
-];
-
 export default function ScrollySequence() {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const [images, setImages] = useState<HTMLImageElement[]>([]);
     const [imagesLoaded, setImagesLoaded] = useState(false);
+    const [loadingProgress, setLoadingProgress] = useState(0);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [loadProgress, setLoadProgress] = useState(0);
-    const [activeTip, setActiveTip] = useState(0);
-
-    // Rotate game tips while loading
-    useEffect(() => {
-        if (imagesLoaded) return;
-        const interval = setInterval(() => {
-            setActiveTip((prev) => (prev + 1) % GAME_TIPS.length);
-        }, 3200);
-        return () => clearInterval(interval);
-    }, [imagesLoaded]);
 
     // 1. Preload the Image Sequence
     useEffect(() => {
@@ -47,8 +28,12 @@ export default function ScrollySequence() {
 
             const checkLoad = () => {
                 loadedCount++;
-                setLoadProgress(Math.floor((loadedCount / TOTAL_FRAMES) * 100));
-                if (loadedCount === TOTAL_FRAMES) setImagesLoaded(true);
+                setLoadingProgress(Math.round((loadedCount / TOTAL_FRAMES) * 100));
+                if (loadedCount === TOTAL_FRAMES) {
+                    setTimeout(() => {
+                        setImagesLoaded(true);
+                    }, 500); // Small luxurious delay for a smooth fade out
+                }
             };
 
             img.onload = checkLoad;
@@ -169,7 +154,7 @@ export default function ScrollySequence() {
         <div ref={containerRef} id="home" className="h-[400vh] relative bg-[#000000]">
             {/* Header / Navbar Appears at 90% */}
             <motion.nav style={{ opacity: opacityCta, pointerEvents: pointerEventsCta as any }} className="navbar fixed top-0 w-full z-[1000] flex justify-between items-center py-6 px-8 md:px-12 bg-black border-b border-[#D4AF37]/30 shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-b-3xl">
-                <a href="#home" className="logo font-playfair text-[#D4AF37] tracking-[4px] cursor-pointer hover:text-[#F3E5AB] transition">QASHEW</a>
+                <div className="logo font-playfair text-[#D4AF37] tracking-[4px]">QASHEW</div>
                 <div
                     className={`hamburger flex flex-col gap-[6px] cursor-pointer z-[1001] ${menuOpen ? 'active' : ''}`}
                     onClick={() => setMenuOpen(!menuOpen)}
@@ -191,167 +176,67 @@ export default function ScrollySequence() {
             </motion.div>
 
             {/* Loading State */}
-            {!imagesLoaded && (
-                <div className="fixed inset-0 min-h-screen w-full flex flex-col items-center justify-center bg-[#050505] z-[9999] border-y-[4px] border-[#D4AF37]/20 shadow-[inset_0_0_200px_rgba(0,0,0,0.9)]">
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(40,30,20,0.6)_0%,rgba(5,5,5,1)_100%)] pointer-events-none"></div>
-                    
-                    <div className="relative flex flex-col items-center justify-center gap-6 z-10 w-full px-8">
-                        {/* Luxury Cashew Animation */}
-                        <motion.div 
-                            className="relative flex items-center justify-center w-40 h-40 mb-6"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 1 }}
-                        >
-                            {/* Outer ethereal rings */}
-                            <motion.div 
-                                className="absolute inset-0 border-[1px] border-[#D4AF37]/20 rounded-full shadow-[0_0_30px_rgba(212,175,55,0.15)]"
-                                animate={{ rotate: 360, scale: [1, 1.05, 1] }}
-                                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                            />
-                            <motion.div 
-                                className="absolute inset-4 border-[1px] border-dashed border-[#D4AF37]/30 rounded-full"
-                                animate={{ rotate: -360 }}
-                                transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-                            />
+            <AnimatePresence>
+                {!imagesLoaded && (
+                    <motion.div
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, transition: { duration: 0.8, ease: "easeInOut" } }}
+                        className="fixed inset-0 h-screen w-full flex flex-col items-center justify-center bg-[#000000] z-[9999] select-none"
+                        style={{
+                            background: "radial-gradient(circle at center, #07140B 0%, #000000 100%)"
+                        }}
+                    >
+                        {/* Elegant gold glowing radial accent in background */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#D4AF37]/5 blur-[120px] rounded-full pointer-events-none" />
 
-                            {/* Floating Cashew Core */}
+                        <div className="flex flex-col items-center gap-8 z-10 max-w-md w-full px-8 text-center">
+                            {/* Logo */}
                             <motion.div
-                                animate={{ y: [-6, 6, -6], rotate: [-3, 3, -3] }}
-                                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                className="relative z-10 flex items-center justify-center"
+                                initial={{ y: -20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ duration: 1, ease: "easeOut" }}
+                                className="flex flex-col items-center gap-2"
                             >
-                                <svg width="70" height="90" viewBox="0 0 70 90" className="drop-shadow-[0_0_25px_rgba(212,175,55,0.8)]">
-                                    <defs>
-                                        <linearGradient id="cashew-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stopColor="#F3E5AB" stopOpacity="0.95" />
-                                            <stop offset="50%" stopColor="#D4AF37" stopOpacity="0.8" />
-                                            <stop offset="100%" stopColor="#8A6327" stopOpacity="1" />
-                                        </linearGradient>
-                                        <filter id="glow">
-                                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                                            <feMerge>
-                                                <feMergeNode in="coloredBlur"/>
-                                                <feMergeNode in="SourceGraphic"/>
-                                            </feMerge>
-                                        </filter>
-                                    </defs>
-                                    
-                                    {/* The Cashew Nut Path */}
-                                    <motion.path
-                                        d="M 28 12 C 55 2 75 35 50 65 C 25 95 -10 65 12 45 C 20 38 20 22 28 12 Z"
-                                        stroke="#F3E5AB"
-                                        strokeWidth="2"
-                                        fill="url(#cashew-gradient)"
-                                        filter="url(#glow)"
-                                        initial={{ pathLength: 0, opacity: 0.2 }}
-                                        animate={{ pathLength: 1, opacity: 1 }}
-                                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                                <span className="text-[#D4AF37] font-playfair text-4xl md:text-5xl tracking-[0.3em] font-semibold text-shadow-gold" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                    QASHEW
+                                </span>
+                                <span className="text-white/40 text-[10px] tracking-[0.6em] uppercase font-light">
+                                    The Golden Standard
+                                </span>
+                            </motion.div>
+
+                            {/* Progress bar container */}
+                            <div className="w-full relative mt-4">
+                                <div className="h-[2px] w-full bg-white/10 rounded-full overflow-hidden relative">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-[#1E4D2B] via-[#D4AF37] to-[#D4AF37] rounded-full relative"
+                                        style={{ width: `${loadingProgress}%` }}
+                                        transition={{ type: "spring", stiffness: 100, damping: 20 }}
                                     />
-                                    
-                                    {/* Inner sheen line for 3D effect */}
-                                    <motion.path
-                                        d="M 32 18 C 50 12 65 35 48 58"
-                                        stroke="#FFFFFF"
-                                        strokeWidth="1.5"
-                                        strokeLinecap="round"
-                                        fill="transparent"
-                                        initial={{ pathLength: 0, opacity: 0 }}
-                                        animate={{ pathLength: 1, opacity: 0.6 }}
-                                        transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
-                                    />
-                                </svg>
-                            </motion.div>
-
-                            {/* Orbiting Sparkles */}
-                            <motion.div 
-                                className="absolute inset-0"
-                                animate={{ rotate: 360 }}
-                                transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-                            >
-                                <div className="absolute top-0 left-1/2 w-2 h-2 bg-[#F3E5AB] rounded-full shadow-[0_0_10px_#F3E5AB] -translate-x-1/2 -translate-y-1/2"></div>
-                            </motion.div>
-                            <motion.div 
-                                className="absolute inset-2"
-                                animate={{ rotate: -360 }}
-                                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-                            >
-                                <div className="absolute bottom-0 right-1/4 w-1.5 h-1.5 bg-[#D4AF37] rounded-full shadow-[0_0_8px_#D4AF37] translate-x-1/2 translate-y-1/2"></div>
-                            </motion.div>
-                        </motion.div>
-
-                        {/* QASHEW Text Shimmer */}
-                        <div className="text-3xl md:text-5xl font-bold tracking-[0.4em] text-center uppercase" style={{ fontFamily: 'Playfair Display, serif' }}>
-                            <span className="text-[#C8A97E] drop-shadow-[0_0_15px_rgba(212,175,55,0.4)]">
-                                QASHEW
-                            </span>
-                        </div>
-
-                        {/* Game-style Cashew Progress Bar */}
-                        <div className="w-64 md:w-96 mt-6 flex flex-col items-center relative">
-                            <div className="flex justify-between w-full mb-4 px-1">
-                                <span className="text-[#D4AF37] font-mono text-[10px] tracking-widest uppercase animate-pulse">Loading Assets</span>
-                                <span className="text-[#D4AF37] font-mono text-[10px] tracking-widest">{loadProgress}%</span>
-                            </div>
-                            
-                            {/* Track Container */}
-                            <div className="w-full h-[3px] bg-white/10 relative rounded-full">
-                                
-                                {/* Filled Track */}
-                                <motion.div 
-                                    className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#C8A97E] to-[#F3E5AB] rounded-full shadow-[0_0_12px_rgba(212,175,55,0.8)]"
-                                    initial={{ width: "0%" }}
-                                    animate={{ width: `${loadProgress}%` }}
-                                    transition={{ duration: 0.1, ease: "linear" }}
+                                </div>
+                                {/* Subtle glowing indicator under the bar */}
+                                <div 
+                                    className="absolute top-0 h-[2px] bg-[#D4AF37] blur-sm transition-all duration-300"
+                                    style={{ left: 0, width: `${loadingProgress}%` }}
                                 />
+                            </div>
 
-                                {/* Travelling Cashew Animation Node */}
-                                <motion.div 
-                                    className="absolute top-1/2 -mt-4 -ml-4 w-8 h-8 flex items-center justify-center pointer-events-none drop-shadow-[0_0_10px_rgba(212,175,55,1)]"
-                                    initial={{ left: "0%" }}
-                                    animate={{ left: `${loadProgress}%` }}
-                                    transition={{ duration: 0.1, ease: "linear" }}
+                            {/* Progress text */}
+                            <div className="flex flex-col items-center gap-2 mt-2">
+                                <motion.span 
+                                    className="text-white/80 font-mono text-lg font-light tracking-widest"
+                                    key={loadingProgress}
+                                    initial={{ opacity: 0.5, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.1 }}
                                 >
-                                    <motion.svg 
-                                        width="100%" height="100%" viewBox="0 0 70 90" 
-                                        animate={{ rotate: [-10, 10, -10], scale: [1, 1.1, 1] }}
-                                        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                    >
-                                        <path
-                                            d="M 28 12 C 55 2 75 35 50 65 C 25 95 -10 65 12 45 C 20 38 20 22 28 12 Z"
-                                            fill="url(#mini-cashew-gradient)"
-                                            stroke="#FFFFFF"
-                                            strokeWidth="1.5"
-                                        />
-                                        <defs>
-                                            <linearGradient id="mini-cashew-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stopColor="#F3E5AB" />
-                                                <stop offset="100%" stopColor="#D4AF37" />
-                                            </linearGradient>
-                                        </defs>
-                                    </motion.svg>
-                                </motion.div>
+                                    {loadingProgress}%
+                                </motion.span>
                             </div>
                         </div>
-
-                        {/* Rotating Game Tips */}
-                        <div className="h-10 mt-4 flex items-center justify-center">
-                            <AnimatePresence mode="wait">
-                                <motion.p 
-                                    key={activeTip}
-                                    initial={{ opacity: 0, y: 5, filter: "blur(4px)" }}
-                                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                                    exit={{ opacity: 0, y: -5, filter: "blur(4px)" }}
-                                    transition={{ duration: 0.6 }}
-                                    className="tracking-[0.2em] uppercase text-[9px] md:text-[10px] text-[#C8A97E]/70 font-light text-center max-w-sm px-4"
-                                >
-                                    {GAME_TIPS[activeTip]}
-                                </motion.p>
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                </div>
-            )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className={`sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center transition-opacity duration-1000 ${imagesLoaded ? "opacity-100" : "opacity-0"}`}>
 
